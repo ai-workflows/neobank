@@ -1,0 +1,407 @@
+{
+  "name": "neobank",
+  "repo": "ai-workflows/neobank",
+  "teams": ["frontend", "backend", "infra"],
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Create accounts database schema",
+      "team": "infra",
+      "priority": 1,
+      "spec": "Create src/models/accounts.ts with Drizzle schema for accounts table: id (uuid), userId (text), name (text), type (enum: checking/savings/investment), currency (text, default USD), balance (integer, cents), status (enum: active/frozen/closed), createdAt, updatedAt. Export the table and inferred types.",
+      "files": ["src/models/accounts.ts"]
+    },
+    {
+      "id": 2,
+      "title": "Create transactions database schema",
+      "team": "infra",
+      "priority": 1,
+      "spec": "Create src/models/transactions.ts with Drizzle schema for transactions table: id (uuid), accountId (text, FK to accounts), type (enum: debit/credit/transfer), category (text), description (text), amount (integer, cents), balance_after (integer, cents), counterparty (text, nullable), reference (text, unique), status (enum: pending/completed/failed/reversed), createdAt. Export table and types.",
+      "files": ["src/models/transactions.ts"]
+    },
+    {
+      "id": 3,
+      "title": "Create cards database schema",
+      "team": "infra",
+      "priority": 1,
+      "spec": "Create src/models/cards.ts with Drizzle schema for cards table: id (uuid), accountId (text, FK to accounts), last4 (text), brand (enum: visa/mastercard), type (enum: virtual/physical), status (enum: active/frozen/cancelled), dailyLimit (integer, cents), monthlyLimit (integer, cents), expiresAt (text), createdAt. Export table and types.",
+      "files": ["src/models/cards.ts"]
+    },
+    {
+      "id": 4,
+      "title": "Create users database schema",
+      "team": "infra",
+      "priority": 1,
+      "spec": "Create src/models/users.ts with Drizzle schema for users table: id (uuid), email (text, unique), name (text), phone (text, nullable), avatarUrl (text, nullable), kycStatus (enum: pending/verified/rejected), tier (enum: basic/premium/business), createdAt, updatedAt. Export table and types.",
+      "files": ["src/models/users.ts"]
+    },
+    {
+      "id": 5,
+      "title": "Create notifications database schema",
+      "team": "infra",
+      "priority": 1,
+      "spec": "Create src/models/notifications.ts with Drizzle schema for notifications table: id (uuid), userId (text, FK to users), type (enum: transaction/security/marketing/system), title (text), message (text), read (boolean, default false), actionUrl (text, nullable), createdAt. Export table and types.",
+      "files": ["src/models/notifications.ts"]
+    },
+    {
+      "id": 6,
+      "title": "Create beneficiaries database schema",
+      "team": "infra",
+      "priority": 1,
+      "spec": "Create src/models/beneficiaries.ts with Drizzle schema for beneficiaries table: id (uuid), userId (text, FK to users), name (text), bankName (text), accountNumber (text), routingNumber (text, nullable), swift (text, nullable), nickname (text, nullable), isFavorite (boolean, default false), createdAt. Export table and types.",
+      "files": ["src/models/beneficiaries.ts"]
+    },
+    {
+      "id": 7,
+      "title": "Create database seed script",
+      "team": "infra",
+      "priority": 2,
+      "spec": "Create scripts/seed.ts that populates the database with realistic demo data: 3 users, 5 accounts (mix of checking/savings/investment), 50+ transactions across accounts, 4 cards, 10 notifications, 5 beneficiaries. Use realistic names, amounts, and categories. Run Drizzle migrations first, then insert data.",
+      "files": ["scripts/seed.ts"]
+    },
+    {
+      "id": 8,
+      "title": "Create accounts API routes",
+      "team": "backend",
+      "priority": 2,
+      "spec": "Create src/app/api/accounts/route.ts with GET (list all accounts with balances) and POST (create new account). Create src/app/api/accounts/[id]/route.ts with GET (single account with recent transactions) and PATCH (update name/status). Use Drizzle ORM, return JSON. Include proper error handling and Zod validation.",
+      "files": ["src/app/api/accounts/route.ts", "src/app/api/accounts/[id]/route.ts"]
+    },
+    {
+      "id": 9,
+      "title": "Create transactions API routes",
+      "team": "backend",
+      "priority": 2,
+      "spec": "Create src/app/api/transactions/route.ts with GET (list transactions with filters: accountId, type, category, dateRange, pagination) and POST (create transaction - validates sufficient balance for debits). Create src/app/api/transactions/[id]/route.ts with GET (single transaction details). Use Drizzle ORM with proper joins.",
+      "files": ["src/app/api/transactions/route.ts", "src/app/api/transactions/[id]/route.ts"]
+    },
+    {
+      "id": 10,
+      "title": "Create cards API routes",
+      "team": "backend",
+      "priority": 2,
+      "spec": "Create src/app/api/cards/route.ts with GET (list cards for account) and POST (create virtual/physical card). Create src/app/api/cards/[id]/route.ts with GET (card details), PATCH (freeze/unfreeze, update limits), DELETE (cancel card). Include card number masking in responses.",
+      "files": ["src/app/api/cards/route.ts", "src/app/api/cards/[id]/route.ts"]
+    },
+    {
+      "id": 11,
+      "title": "Create transfer API route",
+      "team": "backend",
+      "priority": 2,
+      "spec": "Create src/app/api/transfers/route.ts with POST (transfer between accounts or to beneficiary). Validate: sufficient balance, accounts exist, not same account. Create paired debit/credit transactions atomically. Support internal transfers and external transfers to beneficiaries. Return both transaction records.",
+      "files": ["src/app/api/transfers/route.ts"]
+    },
+    {
+      "id": 12,
+      "title": "Create notifications API routes",
+      "team": "backend",
+      "priority": 2,
+      "spec": "Create src/app/api/notifications/route.ts with GET (list notifications, unread first, paginated). Create src/app/api/notifications/[id]/route.ts with PATCH (mark as read). Create src/app/api/notifications/read-all/route.ts with POST (mark all as read). Include unread count in list response.",
+      "files": ["src/app/api/notifications/route.ts", "src/app/api/notifications/[id]/route.ts", "src/app/api/notifications/read-all/route.ts"]
+    },
+    {
+      "id": 13,
+      "title": "Create beneficiaries API routes",
+      "team": "backend",
+      "priority": 2,
+      "spec": "Create src/app/api/beneficiaries/route.ts with GET (list beneficiaries, favorites first) and POST (add beneficiary with validation). Create src/app/api/beneficiaries/[id]/route.ts with PATCH (update, toggle favorite) and DELETE (remove). Validate bank details format.",
+      "files": ["src/app/api/beneficiaries/route.ts", "src/app/api/beneficiaries/[id]/route.ts"]
+    },
+    {
+      "id": 14,
+      "title": "Create analytics API route",
+      "team": "backend",
+      "priority": 2,
+      "spec": "Create src/app/api/analytics/route.ts with GET that returns: spending by category (pie chart data), income vs expenses by month (bar chart data), account balance history (line chart data), top merchants, total balance across accounts. Accept query params for date range and accountId filter.",
+      "files": ["src/app/api/analytics/route.ts"]
+    },
+    {
+      "id": 15,
+      "title": "Create Button component",
+      "team": "frontend",
+      "priority": 1,
+      "spec": "Create src/components/ui/Button.tsx - a reusable button with variants: primary (indigo), secondary (gray), danger (red), ghost (transparent). Sizes: sm, md, lg. Support disabled state, loading state (spinner), icon slot (left/right). Use Tailwind classes. Export as named export.",
+      "files": ["src/components/ui/Button.tsx"]
+    },
+    {
+      "id": 16,
+      "title": "Create Card UI component",
+      "team": "frontend",
+      "priority": 1,
+      "spec": "Create src/components/ui/Card.tsx - a container component with variants: default (dark bg, border), elevated (shadow), interactive (hover effect). Sub-components: Card, CardHeader, CardTitle, CardContent, CardFooter. Dark theme with gray-900/gray-800 backgrounds. Export all as named exports.",
+      "files": ["src/components/ui/Card.tsx"]
+    },
+    {
+      "id": 17,
+      "title": "Create Input component",
+      "team": "frontend",
+      "priority": 1,
+      "spec": "Create src/components/ui/Input.tsx - text input with label, error message, helper text. Variants: default, filled. Support prefix/suffix icons, currency formatting mode. Dark theme styling (gray-800 bg, gray-700 border). Forward ref. Export as named export.",
+      "files": ["src/components/ui/Input.tsx"]
+    },
+    {
+      "id": 18,
+      "title": "Create Badge component",
+      "team": "frontend",
+      "priority": 1,
+      "spec": "Create src/components/ui/Badge.tsx - small status indicator. Variants: success (green), warning (yellow), error (red), info (blue), neutral (gray). Sizes: sm, md. Optional dot indicator. Export as named export.",
+      "files": ["src/components/ui/Badge.tsx"]
+    },
+    {
+      "id": 19,
+      "title": "Create Avatar component",
+      "team": "frontend",
+      "priority": 1,
+      "spec": "Create src/components/ui/Avatar.tsx - circular avatar with image support, fallback to initials. Sizes: sm (32px), md (48px), lg (64px). Optional status dot (online/offline/away). Border ring option. Export as named export.",
+      "files": ["src/components/ui/Avatar.tsx"]
+    },
+    {
+      "id": 20,
+      "title": "Create Modal component",
+      "team": "frontend",
+      "priority": 1,
+      "spec": "Create src/components/ui/Modal.tsx - accessible modal dialog. Backdrop blur, centered content, close button. Sub-components: Modal, ModalHeader, ModalBody, ModalFooter. Trap focus, close on Escape. Animate in/out with CSS transitions. Export all as named exports.",
+      "files": ["src/components/ui/Modal.tsx"]
+    },
+    {
+      "id": 21,
+      "title": "Create Sidebar navigation component",
+      "team": "frontend",
+      "priority": 2,
+      "spec": "Create src/components/layout/Sidebar.tsx - vertical navigation sidebar. Sections: Dashboard, Accounts, Cards, Transfers, Analytics, Settings. Each item has an icon (from lucide-react), label, and active state. Collapsible on mobile. Dark theme (gray-900 bg). User avatar and name at bottom. Export as default.",
+      "files": ["src/components/layout/Sidebar.tsx"]
+    },
+    {
+      "id": 22,
+      "title": "Create TopBar component",
+      "team": "frontend",
+      "priority": 2,
+      "spec": "Create src/components/layout/TopBar.tsx - horizontal top bar with: page title (dynamic), search input, notification bell with unread count badge, user avatar dropdown. Sticky positioning. Dark theme. Export as default.",
+      "files": ["src/components/layout/TopBar.tsx"]
+    },
+    {
+      "id": 23,
+      "title": "Create Dashboard page",
+      "team": "frontend",
+      "priority": 3,
+      "spec": "Create src/app/dashboard/page.tsx - main dashboard showing: total balance card, list of accounts with balances, recent transactions (last 5), quick action buttons (Send, Request, Pay). Use Card components. Fetch data from /api/accounts and /api/transactions. Responsive grid layout.",
+      "files": ["src/app/dashboard/page.tsx"]
+    },
+    {
+      "id": 24,
+      "title": "Create Accounts page",
+      "team": "frontend",
+      "priority": 3,
+      "spec": "Create src/app/accounts/page.tsx - list all accounts in cards showing: name, type badge, balance, last 3 transactions. Click to expand details. 'New Account' button opens modal. Fetch from /api/accounts. Use account type icons (piggy bank for savings, briefcase for investment, wallet for checking).",
+      "files": ["src/app/accounts/page.tsx"]
+    },
+    {
+      "id": 25,
+      "title": "Create Account Detail page",
+      "team": "frontend",
+      "priority": 3,
+      "spec": "Create src/app/accounts/[id]/page.tsx - single account view with: balance prominently displayed, full transaction list with filters (type, date range, search), account info card (type, status, created date). Pagination for transactions. Chart showing balance over time.",
+      "files": ["src/app/accounts/[id]/page.tsx"]
+    },
+    {
+      "id": 26,
+      "title": "Create Transaction List component",
+      "team": "frontend",
+      "priority": 2,
+      "spec": "Create src/components/transactions/TransactionList.tsx - reusable transaction list with: merchant/description, category icon, amount (green for credit, red for debit), date, status badge. Support grouping by date. Click to show detail modal. Props: transactions array, onLoadMore callback. Export as named export.",
+      "files": ["src/components/transactions/TransactionList.tsx"]
+    },
+    {
+      "id": 27,
+      "title": "Create Cards page",
+      "team": "frontend",
+      "priority": 3,
+      "spec": "Create src/app/cards/page.tsx - display cards as visual credit card representations (gradient backgrounds, card number masked, brand logo, expiry). Toggle freeze/unfreeze. Show spending limits with progress bars. 'New Card' button. Fetch from /api/cards.",
+      "files": ["src/app/cards/page.tsx"]
+    },
+    {
+      "id": 28,
+      "title": "Create CreditCard visual component",
+      "team": "frontend",
+      "priority": 2,
+      "spec": "Create src/components/cards/CreditCard.tsx - visual credit card component with: gradient background (different colors per brand), masked card number (dots + last 4), cardholder name, expiry date, brand logo (Visa/Mastercard), frozen overlay effect. Aspect ratio 1.586:1. CSS-only, no images. Export as named export.",
+      "files": ["src/components/cards/CreditCard.tsx"]
+    },
+    {
+      "id": 29,
+      "title": "Create Transfer page",
+      "team": "frontend",
+      "priority": 3,
+      "spec": "Create src/app/transfers/page.tsx - transfer flow: select source account, select destination (own account or beneficiary), enter amount with currency, add note. Show available balance. Confirmation step before submit. POST to /api/transfers. Success/error feedback. Recent transfers list below form.",
+      "files": ["src/app/transfers/page.tsx"]
+    },
+    {
+      "id": 30,
+      "title": "Create Analytics page",
+      "team": "frontend",
+      "priority": 3,
+      "spec": "Create src/app/analytics/page.tsx - financial analytics dashboard: spending by category (donut chart), income vs expenses over 6 months (bar chart), balance trend (line chart), top 5 merchants table. Date range picker. Fetch from /api/analytics. Use recharts library. Responsive grid.",
+      "files": ["src/app/analytics/page.tsx"]
+    },
+    {
+      "id": 31,
+      "title": "Create SpendingChart component",
+      "team": "frontend",
+      "priority": 2,
+      "spec": "Create src/components/charts/SpendingChart.tsx - donut/pie chart showing spending by category using recharts. Categories with distinct colors. Center label showing total. Legend below. Responsive. Props: data array of {category, amount, color}. Dark theme compatible. Export as named export.",
+      "files": ["src/components/charts/SpendingChart.tsx"]
+    },
+    {
+      "id": 32,
+      "title": "Create BalanceChart component",
+      "team": "frontend",
+      "priority": 2,
+      "spec": "Create src/components/charts/BalanceChart.tsx - line chart showing account balance over time using recharts. Gradient fill under line. Tooltip showing date and formatted balance. X-axis: dates, Y-axis: currency. Props: data array of {date, balance}. Dark theme. Export as named export.",
+      "files": ["src/components/charts/BalanceChart.tsx"]
+    },
+    {
+      "id": 33,
+      "title": "Create IncomeExpenseChart component",
+      "team": "frontend",
+      "priority": 2,
+      "spec": "Create src/components/charts/IncomeExpenseChart.tsx - grouped bar chart comparing income vs expenses by month using recharts. Green bars for income, red for expenses. Tooltip with formatted amounts. Props: data array of {month, income, expense}. Dark theme. Export as named export.",
+      "files": ["src/components/charts/IncomeExpenseChart.tsx"]
+    },
+    {
+      "id": 34,
+      "title": "Create Settings page",
+      "team": "frontend",
+      "priority": 3,
+      "spec": "Create src/app/settings/page.tsx - settings page with sections: Profile (name, email, phone, avatar upload), Security (change password, 2FA toggle), Notifications (email/push preferences per category), Appearance (theme toggle). Form-based with save buttons per section. Use Input and Button components.",
+      "files": ["src/app/settings/page.tsx"]
+    },
+    {
+      "id": 35,
+      "title": "Create Notification Bell component",
+      "team": "frontend",
+      "priority": 2,
+      "spec": "Create src/components/notifications/NotificationBell.tsx - bell icon with unread count badge. Click opens dropdown panel with notification list (icon, title, message, time ago). 'Mark all read' button. Individual click marks as read. Fetch from /api/notifications. Auto-refresh every 30s. Export as named export.",
+      "files": ["src/components/notifications/NotificationBell.tsx"]
+    },
+    {
+      "id": 36,
+      "title": "Create QuickActions component",
+      "team": "frontend",
+      "priority": 2,
+      "spec": "Create src/components/dashboard/QuickActions.tsx - row of quick action buttons for dashboard: Send Money, Request Money, Pay Bill, Add Money. Each with icon and label. Click navigates to relevant page or opens modal. Responsive (2x2 grid on mobile, 4 cols on desktop). Export as named export.",
+      "files": ["src/components/dashboard/QuickActions.tsx"]
+    },
+    {
+      "id": 37,
+      "title": "Create BalanceSummary component",
+      "team": "frontend",
+      "priority": 2,
+      "spec": "Create src/components/dashboard/BalanceSummary.tsx - hero card showing total balance across all accounts. Breakdown by account type (checking, savings, investment) with mini bar chart. Month-over-month change with up/down arrow. Format large numbers with abbreviations. Export as named export.",
+      "files": ["src/components/dashboard/BalanceSummary.tsx"]
+    },
+    {
+      "id": 38,
+      "title": "Create user profile API route",
+      "team": "backend",
+      "priority": 2,
+      "spec": "Create src/app/api/user/route.ts with GET (return current user profile) and PATCH (update profile fields). Create src/app/api/user/avatar/route.ts with POST (upload avatar, store as base64 or file path). Validate email format, phone format. Return full user object.",
+      "files": ["src/app/api/user/route.ts", "src/app/api/user/avatar/route.ts"]
+    },
+    {
+      "id": 39,
+      "title": "Create Table component",
+      "team": "frontend",
+      "priority": 1,
+      "spec": "Create src/components/ui/Table.tsx - data table with: sortable columns, alternating row colors, hover highlight. Sub-components: Table, TableHead, TableBody, TableRow, TableCell, TableHeader. Support for empty state message. Dark theme (gray-900/gray-800). Export all as named exports.",
+      "files": ["src/components/ui/Table.tsx"]
+    },
+    {
+      "id": 40,
+      "title": "Create Dropdown component",
+      "team": "frontend",
+      "priority": 1,
+      "spec": "Create src/components/ui/Dropdown.tsx - dropdown select component with search/filter. Support single and multi select. Custom option rendering. Keyboard navigation. Dark theme. Props: options array, value, onChange, placeholder, searchable boolean. Export as named export.",
+      "files": ["src/components/ui/Dropdown.tsx"]
+    },
+    {
+      "id": 41,
+      "title": "Create Toast notification system",
+      "team": "frontend",
+      "priority": 2,
+      "spec": "Create src/components/ui/Toast.tsx and src/lib/toast.ts - toast notification system. Types: success, error, warning, info. Auto-dismiss after 5s. Stack from bottom-right. Animate slide-in/out. API: toast.success('message'), toast.error('message'). Provider component wraps app. Max 3 visible.",
+      "files": ["src/components/ui/Toast.tsx", "src/lib/toast.ts"]
+    },
+    {
+      "id": 42,
+      "title": "Create Skeleton loader component",
+      "team": "frontend",
+      "priority": 1,
+      "spec": "Create src/components/ui/Skeleton.tsx - animated placeholder for loading states. Variants: text (single line), card (rectangular), circle (avatar), table (rows). Pulse animation. Configurable width/height. Compose to build page-specific loading states. Export as named export.",
+      "files": ["src/components/ui/Skeleton.tsx"]
+    },
+    {
+      "id": 43,
+      "title": "Create EmptyState component",
+      "team": "frontend",
+      "priority": 1,
+      "spec": "Create src/components/ui/EmptyState.tsx - display when lists are empty. Props: icon (lucide-react), title, description, action button (optional). Centered layout with muted colors. Used across pages when no data. Export as named export.",
+      "files": ["src/components/ui/EmptyState.tsx"]
+    },
+    {
+      "id": 44,
+      "title": "Create search/filter API for transactions",
+      "team": "backend",
+      "priority": 3,
+      "spec": "Create src/app/api/transactions/search/route.ts with GET - full-text search across transaction descriptions and counterparties. Support filters: minAmount, maxAmount, category, dateFrom, dateTo. Sort by date (desc default) or amount. Return paginated results with total count.",
+      "files": ["src/app/api/transactions/search/route.ts"]
+    },
+    {
+      "id": 45,
+      "title": "Create dashboard layout with sidebar",
+      "team": "frontend",
+      "priority": 2,
+      "spec": "Create src/app/(dashboard)/layout.tsx - layout wrapper for all dashboard pages. Includes Sidebar on left (fixed, 256px), TopBar at top, main content area scrollable. Responsive: sidebar collapses to hamburger menu on mobile. Dark theme. All pages under (dashboard) group use this layout.",
+      "files": ["src/app/(dashboard)/layout.tsx"]
+    },
+    {
+      "id": 46,
+      "title": "Create Tabs component",
+      "team": "frontend",
+      "priority": 1,
+      "spec": "Create src/components/ui/Tabs.tsx - tab navigation component. Sub-components: Tabs, TabList, Tab, TabPanel. Support keyboard navigation (arrow keys). Active tab indicator with animation. Variants: underline, pills. Dark theme styling. Export all as named exports.",
+      "files": ["src/components/ui/Tabs.tsx"]
+    },
+    {
+      "id": 47,
+      "title": "Create Pagination component",
+      "team": "frontend",
+      "priority": 1,
+      "spec": "Create src/components/ui/Pagination.tsx - pagination controls with: previous/next buttons, page numbers (truncated with ellipsis for many pages), items per page selector. Props: totalItems, currentPage, pageSize, onChange. Dark theme. Export as named export.",
+      "files": ["src/components/ui/Pagination.tsx"]
+    },
+    {
+      "id": 48,
+      "title": "Create recurring payments schema and API",
+      "team": "backend",
+      "priority": 3,
+      "spec": "Create src/models/recurring.ts with Drizzle schema: id, accountId, beneficiaryId, amount, frequency (weekly/monthly/yearly), nextDate, description, status (active/paused/cancelled), createdAt. Create src/app/api/recurring/route.ts with GET (list) and POST (create). PATCH for pause/resume.",
+      "files": ["src/models/recurring.ts", "src/app/api/recurring/route.ts"]
+    },
+    {
+      "id": 49,
+      "title": "Create account statements API",
+      "team": "backend",
+      "priority": 3,
+      "spec": "Create src/app/api/accounts/[id]/statements/route.ts with GET - generate account statement for a date range. Return: account info, opening balance, closing balance, all transactions in range, summary (total credits, total debits, count). Support JSON format.",
+      "files": ["src/app/api/accounts/[id]/statements/route.ts"]
+    },
+    {
+      "id": 50,
+      "title": "Create exchange rates API",
+      "team": "backend",
+      "priority": 3,
+      "spec": "Create src/app/api/exchange-rates/route.ts with GET - return mock exchange rates for common currency pairs (USD/EUR, USD/GBP, USD/JPY, etc.). Include buy/sell rates with spread. Cache rates in memory with 5-minute refresh. Support query param ?base=USD.",
+      "files": ["src/app/api/exchange-rates/route.ts"]
+    }
+  ]
+}

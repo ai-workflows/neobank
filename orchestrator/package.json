@@ -1,0 +1,15 @@
+{
+  "name": "neobank-orchestrator",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx orchestrator.ts",
+    "create-tasks": "tsx create-tasks.ts",
+    "setup-workers": "tsx setup-workers.ts"
+  },
+  "dependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}
