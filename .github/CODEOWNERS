@@ -1,0 +1,4 @@
+# Changes that publish or expose this repository need the owner's review.
+/.github/       @josephvitko
+/package.json   @josephvitko
+/next.config.ts @josephvitko
